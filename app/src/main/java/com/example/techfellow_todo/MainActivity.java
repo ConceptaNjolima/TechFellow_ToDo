@@ -1,5 +1,6 @@
 package com.example.techfellow_todo;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 items.remove(position);
                 // notify the adapter about the position where item was deleted
                 itemsAdapter.notifyItemRemoved(position);
-                Toast.makeText(getApplicationContext(),"Item removed", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(),"Item removed", Toast.LENGTH_SHORT).show();
                 saveItem();
 
             }
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 // notify adapter about  new item
                 itemsAdapter.notifyItemInserted(items.size()-1);
                 etItem.setText("");
-                Toast.makeText(getApplicationContext(),"Item added", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(),"Item added", Toast.LENGTH_SHORT).show();
                 saveItem();
             }
         });
@@ -95,6 +96,27 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode==RESULT_OK && requestCode== EDIT_TEXT_CODE){
+            //trieve updated value
+            String itemText=data.getStringExtra(KEY_ITEM_TEXT);
+            //extract position from key position
+            int position=data.getExtras().getInt(KEY_ITEM_POSITION);
+            //update the model with new items
+            items.set(position,itemText);
+            //notify adapter of the changes
+            itemsAdapter.notifyItemChanged(position);
+            //persist the changes
+            saveItem();
+            Toast.makeText(this, "Item updated", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Log.w("MainActivity", "the codes do not match ");
+        }
+    }
+
     private File getDataFile(){
         return new File(getFilesDir(),"data.txt");
     }
